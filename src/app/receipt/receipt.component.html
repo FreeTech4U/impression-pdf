@@ -1,0 +1,90 @@
+<div class="receipt-position">
+  <div id="receipt">
+    <div id="receipt-content">
+      <h1>{{ receipt.storeName }}</h1>
+      <p>{{ receipt.address }}</p>
+      <p>Date: {{ receipt.date }}</p>
+
+      <hr>
+
+      <table>
+        <thead>
+        <tr>
+          <th>Article</th>
+          <th>Quantité</th>
+          <th>Prix</th>
+        </tr>
+        </thead>
+        <tbody>
+          @for (item of receipt.items; track item){
+            <tr>
+              <td>{{ item.name }}</td>
+              <td>{{ item.quantity }}</td>
+              <td>{{ item.price | currency:'XOF' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      <hr>
+
+      <p>Sous-total: {{ receipt.total | currency:'XOF' }}</p>
+      <p>Taxe: {{ receipt.tax | currency:'XOF' }}</p>
+      <h3>Total: {{ receipt.grandTotal | currency:'XOF' }}</h3>
+    </div>
+    <button (click)="captureAndDownloadImage('receipt')">Imprimer le ticket</button>
+  </div>
+
+</div>
+
+<div class="receipt-position">
+  <div id="receipt-content1" class="ticket">
+    <h2 class="store-name">ACE Informatique</h2>
+    <p class="store-address">67, Avenue de Verdun<br>77470 - Trilport</p>
+    <p class="store-contact">Tél : 01.60.44.19.81<br>Siret 385 435 825 00017</p>
+
+    <div class="barcode-section">
+      <p>00000511</p>
+    </div>
+
+    <h2 class="title">FACTURE</h2>
+
+    <p class="date-info">
+      Réception 13/02/2007 - 15:08<br>
+      Livraison 16/02/2007 VE/AP
+    </p>
+
+    <table class="items">
+      <tr>
+        <td>7 - VIDAL</td>
+        <td>C.A</td>
+        <td>15.95</td>
+      </tr>
+      <tr>
+        <td>Gratuit</td>
+        <td>3.00 Pour</td>
+        <td>30.00</td>
+      </tr>
+      <tr>
+        <td>166-1 Veste</td>
+        <td>4.50</td>
+      </tr>
+      <tr>
+        <td>167-1 Pantalon</td>
+        <td>3.30</td>
+      </tr>
+      <!-- Ajouter d'autres éléments similaires -->
+    </table>
+
+    <p class="total">
+      DOIT 0.00<br>
+      Dont TVA 19.60% 5.21
+    </p>
+
+    <p class="thanks">ACE vous remercie de votre visite</p>
+
+    <button (click)="generatePdf('receipt-content1')">Générer le PDF</button>
+  </div>
+</div>
+
+
