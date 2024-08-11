@@ -3,6 +3,7 @@ import {CurrencyPipe} from "@angular/common";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import JsBarcode from "jsbarcode";
+import {getCurrentFormattedDate} from "../../shared/utils/generic-utils";
 
 @Component({
   selector: 'app-receipt',
@@ -41,18 +42,19 @@ export class ReceiptComponent {
         html2canvas(data, { scale: 4 }).then(canvas => {
           const imgWidth = 90; // largeur de l'image en mm (A4 width - marges)
           const pageHeight = 180; // hauteur de la page A4 en mm
-          const pageWidth = 210;  // largeur de la page A4 en mm
-          const imgHeight = canvas.height * imgWidth / canvas.width;
+          const pageWidth = 150;  // largeur de la page A4 en mm
+          const imgHeight = 140; //canvas.height * imgWidth / canvas.width;
           let heightLeft = imgHeight;
           let position = 10;
 
-          const pdf = new jsPDF('p', 'mm', 'a4');
+          const pdf = new jsPDF('p', 'mm', 'a5');
           const xOffset = (pageWidth - imgWidth) / 2;  // Calculer l'offset horizontal pour centrer l'image
           const yOffset = (pageHeight - imgHeight) / 2; // Calculer l'offset vertical pour centrer l'image
 
           // Si l'image est plus grande que la page, commence en haut (marge de 10)
           const initialPosition = imgHeight > pageHeight ? 10 : yOffset;
 
+         // pdf.addImage(canvas.toDataURL('image/png', 1.0), 'PNG', xOffset, initialPosition, imgWidth, imgHeight);
           pdf.addImage(canvas.toDataURL('image/png', 1.0), 'PNG', xOffset, initialPosition, imgWidth, imgHeight);
           heightLeft -= pageHeight;
 
@@ -64,7 +66,7 @@ export class ReceiptComponent {
             heightLeft -= pageHeight;
           }
 
-          pdf.save('receipt.pdf'); // Sauvegarde le fichier PDF avec un nom
+          pdf.save('receipt_'+getCurrentFormattedDate()+'.pdf'); // Sauvegarde le fichier PDF avec un nom
         });
       }
   }
