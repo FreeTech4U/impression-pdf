@@ -1,8 +1,8 @@
-import { Component } from '@angular/core';
+import {Component, ElementRef, ViewChild} from '@angular/core';
 import {CurrencyPipe} from "@angular/common";
 import html2canvas from "html2canvas";
-import jspdf from "jspdf";
 import jsPDF from "jspdf";
+import JsBarcode from "jsbarcode";
 
 @Component({
   selector: 'app-receipt',
@@ -27,37 +27,57 @@ export class ReceiptComponent {
     tax: 0.50,
     grandTotal: 7.20
   };
+  @ViewChild('barcode') barcodeElement: ElementRef | undefined;
 
-  generatePdf(id:any) {
-    const data = document.getElementById(id);
-    if (data) {
-      html2canvas(data).then(canvas => {
-        const imgWidth = 90; // largeur de l'image (A4 width - marges)
-        const pageHeight = 295; // hauteur de la page A4 en mm
-        const pageWidth = 210;
-        const imgHeight = canvas.height * imgWidth / canvas.width;
-        let heightLeft = imgHeight;
-
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const xOffset = (pageWidth - imgWidth) / 2; // Calculer l'offset horizontal pour centrer l'image
-        let position = 10; // position initiale avec marge en haut
-
-        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 10, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-
-        // Si le contenu dépasse une page, ajouter d'autres pages
-        while (heightLeft >= 0) {
-          position = heightLeft - imgHeight;
-          pdf.addPage();
-          pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 10, position, imgWidth, imgHeight);
-          heightLeft -= pageHeight;
-        }
-
-        pdf.save('receipt.pdf'); // Sauvegarde le fichier PDF avec un nom
-      });
-    }
+  constructor() {
+  }
+  ngAfterViewInit() {
+    this.generateBarcode(this.receipt.grandTotal.toString()+"101010125");
   }
 
+  generatePdf(id:any) {
+      const data = document.getElementById(id);
+      if (data) {
+        html2canvas(data, { scale: 4 }).then(canvas => {
+          const imgWidth = 90; // largeur de l'image en mm (A4 width - marges)
+          const pageHeight = 180; // hauteur de la page A4 en mm
+          const pageWidth = 210;  // largeur de la page A4 en mm
+          const imgHeight = canvas.height * imgWidth / canvas.width;
+          let heightLeft = imgHeight;
+          let position = 10;
+
+          const pdf = new jsPDF('p', 'mm', 'a4');
+          const xOffset = (pageWidth - imgWidth) / 2;  // Calculer l'offset horizontal pour centrer l'image
+          const yOffset = (pageHeight - imgHeight) / 2; // Calculer l'offset vertical pour centrer l'image
+
+          // Si l'image est plus grande que la page, commence en haut (marge de 10)
+          const initialPosition = imgHeight > pageHeight ? 10 : yOffset;
+
+          pdf.addImage(canvas.toDataURL('image/png', 1.0), 'PNG', xOffset, initialPosition, imgWidth, imgHeight);
+          heightLeft -= pageHeight;
+
+          // Si le contenu dépasse une page, ajouter d'autres pages
+          while (heightLeft >= 0) {
+            position = heightLeft - imgHeight;
+            pdf.addPage();
+            pdf.addImage(canvas.toDataURL('image/png', 1.0), 'PNG', xOffset, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+          }
+
+          pdf.save('receipt.pdf'); // Sauvegarde le fichier PDF avec un nom
+        });
+      }
+  }
+
+  generateBarcode(text: string) {
+    JsBarcode(this.barcodeElement?.nativeElement, text, {
+      format: 'CODE128', // Format du code-barres (par exemple, CODE128, EAN, UPC, etc.)
+      width: 2,          // Largeur de chaque barre
+      height: 20,       // Hauteur du code-barres
+     // background:"#ded9d9", // Couleur de fond
+      displayValue: true // Afficher la valeur sous le code-barres
+    });
+  }
   captureAndDownloadImage(id:any) {
     const data = document.getElementById(id);
     if (data) {

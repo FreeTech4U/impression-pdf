@@ -38,15 +38,14 @@
 </div>-->
 
 <div class="receipt-position">
-  <div id="receipt-content1" class="ticket">
+<div>
+  <div id="receipt-content1" class="ticket background-overlay">
     <h2 class="store-name">ACE Informatique</h2>
     <p class="store-address">67, Avenue de Verdun<br>77470 - Trilport</p>
     <p class="store-contact">Tél : 01.60.44.19.81<br>Siret 385 435 825 00017</p>
-
     <div class="barcode-section">
-      <p>00000511</p>
+      <svg #barcode></svg>
     </div>
-
     <h2 class="title">FACTURE</h2>
 
     <p class="date-info">
@@ -82,9 +81,11 @@
     </p>
 
     <p class="thanks">ACE vous remercie de votre visite</p>
-
-    <button (click)="generatePdf('receipt-content1')">Générer le PDF</button>
   </div>
+  <button (click)="generatePdf('receipt-content1')">Télécharger (PDF) </button>
+
+</div>
+
 </div>
 
 
